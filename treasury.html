@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+  <meta charset="UTF-8">
+
+  <title>MC Treasury</title>
+
+  <style>
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+
+      margin: 0;
+
+      padding: 40px 20px;
+
+      background:
+        linear-gradient(
+          135deg,
+          #0f0f0f,
+          #1a1a1a
+        );
+
+      color: white;
+
+      font-family:
+        Arial,
+        sans-serif;
+    }
+
+    h1 {
+
+      text-align: center;
+
+      color: #d32f2f;
+
+      margin-bottom: 40px;
+
+      font-size: 46px;
+    }
+
+    .card {
+
+      max-width: 700px;
+
+      margin: auto;
+
+      background:
+        rgba(22,22,22,0.96);
+
+      border:
+        1px solid #2a2a2a;
+
+      border-radius: 22px;
+
+      padding: 30px;
+    }
+
+    .stock-item {
+
+      display: flex;
+
+      justify-content: space-between;
+
+      align-items: center;
+
+      padding: 18px 0;
+
+      border-bottom:
+        1px solid #2c2c2c;
+
+      font-size: 18px;
+    }
+
+    .stock-item:last-child {
+      border-bottom: none;
+    }
+
+    .quantity {
+
+      background: #d32f2f;
+
+      padding:
+        8px 14px;
+
+      border-radius: 999px;
+
+      font-weight: bold;
+    }
+
+  </style>
+
+</head>
+
+<body>
+
+  <script>
+
+    const password =
+      prompt('Mot de passe');
+
+    if (password !== 'LaMeute') {
+
+      document.body.innerHTML =
+        '<h1>Accès refusé</h1>';
+    }
+
+  </script>
+
+  <h1>Trésorerie MC</h1>
+
+  <div class="card">
+
+    <div id="stocks"></div>
+
+  </div>
+
+  <script>
+
+    const API_URL =
+      'https://script.google.com/macros/s/AKfycbxM0e_7kCpeuHJbPx4bNAROjsvYfbuva5fr_c24dzLoiraBMmmGWhgh3SxYmfuSAqS4/exec
+';
+
+    async function loadStocks() {
+
+      const response =
+        await fetch(API_URL);
+
+      const stocks =
+        await response.json();
+
+      const container =
+        document.getElementById('stocks');
+
+      container.innerHTML = '';
+
+      stocks.forEach(stock => {
+
+        container.innerHTML += `
+
+          <div class="stock-item">
+
+            <span>
+              ${stock.item}
+            </span>
+
+            <span class="quantity">
+              ${stock.quantity}
+            </span>
+
+          </div>
+        `;
+      });
+    }
+
+    loadStocks();
+
+  </script>
+
+</body>
+
+</html>
