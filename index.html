@@ -14,8 +14,17 @@
     }
 
     body {
+
       margin: 0;
-      padding: 30px;
+
+      min-height: 100vh;
+
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+
+      padding: 40px 20px;
+
       background:
         linear-gradient(
           135deg,
@@ -31,76 +40,65 @@
     }
 
     h1 {
-      font-size: 42px;
-      margin-bottom: 30px;
+
+      font-size: 48px;
+
+      margin-bottom: 35px;
+
       color: #d32f2f;
-      letter-spacing: 2px;
+
+      letter-spacing: 3px;
+
+      text-transform: uppercase;
+
+      text-shadow:
+        0 0 15px rgba(211,47,47,0.35);
     }
 
     h2 {
+
       margin-top: 0;
-      margin-bottom: 20px;
+
+      margin-bottom: 25px;
+
       color: #ffffff;
+
+      font-size: 28px;
     }
 
     .card {
+
+      width: 100%;
+
+      max-width: 700px;
+
       background:
-        rgba(30, 30, 30, 0.95);
+        rgba(22, 22, 22, 0.96);
 
       border:
-        1px solid #2d2d2d;
+        1px solid #2a2a2a;
 
-      border-radius: 18px;
+      border-radius: 22px;
 
-      padding: 25px;
+      padding: 30px;
 
       margin-bottom: 25px;
 
       box-shadow:
-        0 0 25px rgba(0,0,0,0.45);
-    }
-
-    .stock-item {
-
-      display: flex;
-
-      justify-content: space-between;
-
-      align-items: center;
-
-      padding: 14px 0;
-
-      border-bottom:
-        1px solid #2c2c2c;
-
-      font-size: 17px;
-    }
-
-    .stock-item:last-child {
-      border-bottom: none;
-    }
-
-    .stock-item span:last-child {
-
-      background: #d32f2f;
-
-      padding:
-        6px 12px;
-
-      border-radius: 999px;
-
-      font-weight: bold;
+        0 0 35px rgba(0,0,0,0.55);
     }
 
     label {
 
       display: block;
 
-      margin-bottom: 8px;
+      margin-bottom: 10px;
 
-      color: #cccccc;
+      color: #bbbbbb;
 
       font-size: 14px;
+
+      font-weight: bold;
     }
 
     input,
@@ -108,18 +106,18 @@
 
       width: 100%;
 
-      padding: 14px;
+      padding: 15px;
 
-      margin-bottom: 20px;
+      margin-bottom: 22px;
 
-      background: #151515;
+      background: #101010;
 
       border:
         1px solid #333;
 
       color: white;
 
-      border-radius: 10px;
+      border-radius: 12px;
 
       font-size: 15px;
 
@@ -134,10 +132,12 @@
       border-color: #d32f2f;
 
       box-shadow:
-        0 0 10px rgba(211,47,47,0.4);
+        0 0 12px rgba(211,47,47,0.35);
     }
 
     button {
+
+      width: 100%;
 
       background:
         linear-gradient(
@@ -151,17 +151,17 @@
       border: none;
 
       padding:
-        14px 22px;
+        16px;
 
-      border-radius: 12px;
+      border-radius: 14px;
 
-      font-size: 15px;
+      font-size: 16px;
 
       font-weight: bold;
 
       cursor: pointer;
 
-      transition: 0.2s;
+      transition: 0.25s;
     }
 
     button:hover {
@@ -169,23 +169,63 @@
       transform: translateY(-2px);
 
       box-shadow:
-        0 8px 20px rgba(211,47,47,0.35);
+        0 10px 25px rgba(211,47,47,0.35);
     }
 
     .movement-preview {
 
       margin-top: 25px;
 
-      padding: 20px;
+      padding: 22px;
 
-      background: #151515;
+      background: #111;
 
       border:
         1px solid #333;
 
-      border-radius: 12px;
+      border-radius: 14px;
 
-      line-height: 1.7;
+      line-height: 1.8;
+
+      font-size: 15px;
+    }
+
+    .preview-title {
+
+      color: #d32f2f;
+
+      font-size: 18px;
+
+      font-weight: bold;
+
+      margin-bottom: 15px;
+    }
+
+    .log-item {
+
+      background: #111;
+
+      border: 1px solid #2f2f2f;
+
+      border-radius: 14px;
+
+      padding: 20px;
+
+      margin-bottom: 15px;
+
+      line-height: 1.8;
+    }
+
+    .log-member {
+      color: #d32f2f;
+      font-weight: bold;
+      font-size: 18px;
+    }
+
+    .log-date {
+      color: #888;
+      font-size: 13px;
+      margin-top: 10px;
     }
 
   </style>
@@ -195,14 +235,6 @@
 <body>
 
   <h1>MC Treasury</h1>
-
-  <div class="card">
-
-    <h2>Stocks</h2>
-
-    <div id="stocks"></div>
-
-  </div>
 
   <div class="card">
 
@@ -265,7 +297,7 @@
     >
 
     <button onclick="submitMovement()">
-      Valider
+      Valider le mouvement
     </button>
 
     <div
@@ -276,31 +308,17 @@
 
   </div>
 
+  <div class="card">
+
+    <h2>Historique des mouvements</h2>
+
+    <div id="logsContainer"></div>
+
+  </div>
+
   <script>
 
-    async function loadStocks() {
-
-      const response =
-        await fetch('./data/stocks.json');
-
-      const data =
-        await response.json();
-
-      const stocksDiv =
-        document.getElementById('stocks');
-
-      stocksDiv.innerHTML = '';
-
-      for (const item in data) {
-
-        stocksDiv.innerHTML += `
-          <div class="stock-item">
-            <span>${item}</span>
-            <span>${data[item]}</span>
-          </div>
-        `;
-      }
-    }
+    let logs = [];
 
     async function loadMembers() {
 
@@ -323,6 +341,50 @@
       });
     }
 
+    function renderLogs() {
+
+      const container =
+        document.getElementById('logsContainer');
+
+      container.innerHTML = '';
+
+      logs
+        .slice()
+        .reverse()
+        .forEach(log => {
+
+          container.innerHTML += `
+
+            <div class="log-item">
+
+              <div class="log-member">
+                ${log.member}
+              </div>
+
+              <br>
+
+              <strong>Sortie :</strong>
+              ${log.removeQuantity} ${log.removeItem}
+
+              <br><br>
+
+              <strong>Entrée :</strong>
+              ${log.addQuantity} ${log.addItem}
+
+              <br><br>
+
+              <strong>Note :</strong>
+              ${log.note}
+
+              <div class="log-date">
+                ${log.date}
+              </div>
+
+            </div>
+          `;
+        });
+    }
+
     function submitMovement() {
 
       const member =
@@ -343,50 +405,92 @@
       const note =
         document.getElementById('note').value;
 
+      if (
+        !removeQuantity ||
+        !addQuantity
+      ) {
+        alert('Remplis toutes les quantités');
+        return;
+      }
+
+      const movement = {
+
+        member,
+
+        removeItem,
+        removeQuantity,
+
+        addItem,
+        addQuantity,
+
+        note,
+
+        date:
+          new Date().toLocaleString('fr-BE')
+      };
+
+      logs.push(movement);
+
+      localStorage.setItem(
+        'mcLogs',
+        JSON.stringify(logs)
+      );
+
+      renderLogs();
+
       const preview =
         document.getElementById('preview');
 
       preview.style.display = 'block';
 
       preview.innerHTML = `
-        <strong>Mouvement enregistré (test)</strong>
 
-        <br><br>
+        <div class="preview-title">
+          Mouvement enregistré
+        </div>
 
-        MEMBRE :
+        <strong>Membre :</strong>
         ${member}
 
         <br><br>
 
-        SORTIE :
+        <strong>Sortie :</strong>
         ${removeQuantity} ${removeItem}
 
         <br><br>
 
-        ENTREE :
+        <strong>Entrée :</strong>
         ${addQuantity} ${addItem}
 
         <br><br>
 
-        NOTE :
+        <strong>Note :</strong>
         ${note}
       `;
 
-      console.log({
-        member,
-        removeItem,
-        removeQuantity,
-        addItem,
-        addQuantity,
-        note
-      });
+      document.getElementById('removeQuantity').value = '';
+      document.getElementById('addQuantity').value = '';
+      document.getElementById('note').value = '';
     }
 
-    loadStocks();
+    function loadLogs() {
+
+      const storedLogs =
+        localStorage.getItem('mcLogs');
+
+      if (storedLogs) {
+        logs = JSON.parse(storedLogs);
+      }
+
+      renderLogs();
+    }
+
     loadMembers();
+    loadLogs();
 
   </script>
 
 </body>
 
 </html>
+
