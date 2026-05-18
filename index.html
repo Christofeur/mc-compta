@@ -201,33 +201,6 @@
       margin-bottom: 15px;
     }
 
-    .log-item {
-
-      background: #111;
-
-      border: 1px solid #2f2f2f;
-
-      border-radius: 14px;
-
-      padding: 20px;
-
-      margin-bottom: 15px;
-
-      line-height: 1.8;
-    }
-
-    .log-member {
-      color: #d32f2f;
-      font-weight: bold;
-      font-size: 18px;
-    }
-
-    .log-date {
-      color: #888;
-      font-size: 13px;
-      margin-top: 10px;
-    }
-
   </style>
 
 </head>
@@ -308,32 +281,16 @@
 
   </div>
 
-  <div class="card">
-
-    <h2>Historique des mouvements</h2>
-
-    <div id="logsContainer"></div>
-
-  </div>
-
   <script>
 
     // =========================================
-    // CONFIG GITHUB
+    // URL APPS SCRIPT
     // =========================================
 
-    const GITHUB_TOKEN =
-      '';
-
-    const REPO_OWNER =
-      'christofeur';
-
-    const REPO_NAME =
-      'mc-compta';
+    const API_URL =
+      'https://script.google.com/macros/s/AKfycbxM0e_7kCpeuHJbPx4bNAROjsvYfbuva5fr_c24dzLoiraBMmmGWhgh3SxYmfuSAqS4/exec';
 
     // =========================================
-
-    let logs = [];
 
     async function loadMembers() {
 
@@ -353,108 +310,6 @@
         select.innerHTML += `
           <option>${member}</option>
         `;
-      });
-    }
-
-    async function loadLogs() {
-
-      const response =
-        await fetch('./data/logs.json');
-
-      logs =
-        await response.json();
-
-      renderLogs();
-    }
-
-    function renderLogs() {
-
-      const container =
-        document.getElementById('logsContainer');
-
-      container.innerHTML = '';
-
-      logs
-        .slice()
-        .reverse()
-        .forEach(log => {
-
-          container.innerHTML += `
-
-            <div class="log-item">
-
-              <div class="log-member">
-                ${log.member}
-              </div>
-
-              <br>
-
-              <strong>Sortie :</strong>
-              ${log.removeQuantity} ${log.removeItem}
-
-              <br><br>
-
-              <strong>Entrée :</strong>
-              ${log.addQuantity} ${log.addItem}
-
-              <br><br>
-
-              <strong>Note :</strong>
-              ${log.note}
-
-              <div class="log-date">
-                ${log.date}
-              </div>
-
-            </div>
-          `;
-        });
-    }
-
-    async function saveLogsToGitHub() {
-
-      const url =
-        `https://api.github.com/repos/${REPO_OWNER}/${REPO_NAME}/contents/data/logs.json`;
-
-      const response =
-        await fetch(url);
-
-      const data =
-        await response.json();
-
-      const sha =
-        data.sha;
-
-      const content =
-        btoa(
-          unescape(
-            encodeURIComponent(
-              JSON.stringify(logs, null, 2)
-            )
-          )
-        );
-
-      await fetch(url, {
-
-        method: 'PUT',
-
-        headers: {
-          Authorization:
-            `token ${GITHUB_TOKEN}`,
-
-          'Content-Type':
-            'application/json'
-        },
-
-        body: JSON.stringify({
-
-          message:
-            'Update logs',
-
-          content: content,
-
-          sha: sha
-        })
       });
     }
 
@@ -496,57 +351,65 @@
         addItem,
         addQuantity,
 
-        note,
-
-        date:
-          new Date().toLocaleString('fr-BE')
+        note
       };
 
-      logs.push(movement);
+      try {
 
-      await saveLogsToGitHub();
+        await fetch(API_URL, {
 
-      renderLogs();
+          method: 'POST',
 
-      const preview =
-        document.getElementById('preview');
+          body: JSON.stringify(movement)
+        });
 
-      preview.style.display = 'block';
+        const preview =
+          document.getElementById('preview');
 
-      preview.innerHTML = `
+        preview.style.display = 'block';
 
-        <div class="preview-title">
-          Mouvement enregistré
-        </div>
+        preview.innerHTML = `
 
-        <strong>Membre :</strong>
-        ${member}
+          <div class="preview-title">
+            Mouvement enregistré
+          </div>
 
-        <br><br>
+          <strong>Membre :</strong>
+          ${member}
 
-        <strong>Sortie :</strong>
-        ${removeQuantity} ${removeItem}
+          <br><br>
 
-        <br><br>
+          <strong>Sortie :</strong>
+          ${removeQuantity} ${removeItem}
 
-        <strong>Entrée :</strong>
-        ${addQuantity} ${addItem}
+          <br><br>
 
-        <br><br>
+          <strong>Entrée :</strong>
+          ${addQuantity} ${addItem}
 
-        <strong>Note :</strong>
-        ${note}
-      `;
+          <br><br>
 
-      document.getElementById('removeQuantity').value = '';
+          <strong>Note :</strong>
+          ${note}
+        `;
 
-      document.getElementById('addQuantity').value = '';
+        document.getElementById('removeQuantity').value = '';
 
-      document.getElementById('note').value = '';
+        document.getElementById('addQuantity').value = '';
+
+        document.getElementById('note').value = '';
+
+        alert('Mouvement envoyé');
+
+      } catch (error) {
+
+        console.error(error);
+
+        alert('Erreur lors de l’envoi');
+      }
     }
 
     loadMembers();
-    loadLogs();
 
   </script>
 
