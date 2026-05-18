@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>MC Compta</title>
+
+  <style>
+    body {
+      background: #111;
+      color: white;
+      font-family: Arial;
+      margin: 0;
+      padding: 20px;
+    }
+
+    h1 {
+      margin-bottom: 30px;
+    }
+
+    .card {
+      background: #1e1e1e;
+      padding: 20px;
+      border-radius: 10px;
+      margin-bottom: 20px;
+    }
+
+    .stock-item {
+      display: flex;
+      justify-content: space-between;
+      padding: 10px 0;
+      border-bottom: 1px solid #333;
+    }
+  </style>
+</head>
+
+<body>
+
+  <h1>MC Treasury</h1>
+
+  <div class="card">
+    <h2>Stocks</h2>
+
+    <div id="stocks"></div>
+  </div>
+
+  <script>
+    async function loadStocks() {
+
+      const response = await fetch('./data/stocks.json');
+
+      const data = await response.json();
+
+      const stocksDiv = document.getElementById('stocks');
+
+      for (const item in data) {
+
+        stocksDiv.innerHTML += `
+          <div class="stock-item">
+            <span>${item}</span>
+            <span>${data[item]}</span>
+          </div>
+        `;
+      }
+    }
+
+    loadStocks();
+  </script>
+
+</body>
+</html>
