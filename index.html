@@ -1,37 +1,195 @@
 <!DOCTYPE html>
 <html lang="fr">
+
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>MC Compta</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <title>MC Treasury</title>
 
   <style>
+
+    * {
+      box-sizing: border-box;
+    }
+
     body {
-      background: #111;
-      color: white;
-      font-family: Arial;
       margin: 0;
-      padding: 20px;
+      padding: 30px;
+      background:
+        linear-gradient(
+          135deg,
+          #0f0f0f,
+          #1a1a1a
+        );
+
+      color: white;
+
+      font-family:
+        Arial,
+        sans-serif;
     }
 
     h1 {
+      font-size: 42px;
       margin-bottom: 30px;
+      color: #d32f2f;
+      letter-spacing: 2px;
+    }
+
+    h2 {
+      margin-top: 0;
+      margin-bottom: 20px;
+      color: #ffffff;
     }
 
     .card {
-      background: #1e1e1e;
-      padding: 20px;
-      border-radius: 10px;
-      margin-bottom: 20px;
+      background:
+        rgba(30, 30, 30, 0.95);
+
+      border:
+        1px solid #2d2d2d;
+
+      border-radius: 18px;
+
+      padding: 25px;
+
+      margin-bottom: 25px;
+
+      box-shadow:
+        0 0 25px rgba(0,0,0,0.45);
     }
 
     .stock-item {
+
       display: flex;
+
       justify-content: space-between;
-      padding: 10px 0;
-      border-bottom: 1px solid #333;
+
+      align-items: center;
+
+      padding: 14px 0;
+
+      border-bottom:
+        1px solid #2c2c2c;
+
+      font-size: 17px;
     }
+
+    .stock-item:last-child {
+      border-bottom: none;
+    }
+
+    .stock-item span:last-child {
+
+      background: #d32f2f;
+
+      padding:
+        6px 12px;
+
+      border-radius: 999px;
+
+      font-weight: bold;
+    }
+
+    label {
+
+      display: block;
+
+      margin-bottom: 8px;
+
+      color: #cccccc;
+
+      font-size: 14px;
+    }
+
+    input,
+    select {
+
+      width: 100%;
+
+      padding: 14px;
+
+      margin-bottom: 20px;
+
+      background: #151515;
+
+      border:
+        1px solid #333;
+
+      color: white;
+
+      border-radius: 10px;
+
+      font-size: 15px;
+
+      transition: 0.2s;
+    }
+
+    input:focus,
+    select:focus {
+
+      outline: none;
+
+      border-color: #d32f2f;
+
+      box-shadow:
+        0 0 10px rgba(211,47,47,0.4);
+    }
+
+    button {
+
+      background:
+        linear-gradient(
+          135deg,
+          #b71c1c,
+          #d32f2f
+        );
+
+      color: white;
+
+      border: none;
+
+      padding:
+        14px 22px;
+
+      border-radius: 12px;
+
+      font-size: 15px;
+
+      font-weight: bold;
+
+      cursor: pointer;
+
+      transition: 0.2s;
+    }
+
+    button:hover {
+
+      transform: translateY(-2px);
+
+      box-shadow:
+        0 8px 20px rgba(211,47,47,0.35);
+    }
+
+    .movement-preview {
+
+      margin-top: 25px;
+
+      padding: 20px;
+
+      background: #151515;
+
+      border:
+        1px solid #333;
+
+      border-radius: 12px;
+
+      line-height: 1.7;
+    }
+
   </style>
+
 </head>
 
 <body>
@@ -39,19 +197,99 @@
   <h1>MC Treasury</h1>
 
   <div class="card">
+
     <h2>Stocks</h2>
 
     <div id="stocks"></div>
+
+  </div>
+
+  <div class="card">
+
+    <h2>Ajouter un mouvement</h2>
+
+    <label>Membre</label>
+
+    <select id="memberSelect"></select>
+
+    <label>Sortie</label>
+
+    <select id="removeItem">
+      <option>Argent Propre</option>
+      <option>Argent Sale</option>
+      <option>Coke</option>
+      <option>Crack</option>
+      <option>Ecstasy</option>
+      <option>Fentanyl</option>
+      <option>Gillet Par Balle</option>
+      <option>Meth</option>
+      <option>Munitions</option>
+      <option>Opium</option>
+      <option>Weed</option>
+    </select>
+
+    <input
+      type="number"
+      id="removeQuantity"
+      placeholder="Quantité sortie"
+    >
+
+    <label>Entrée</label>
+
+    <select id="addItem">
+      <option>Argent Propre</option>
+      <option>Argent Sale</option>
+      <option>Coke</option>
+      <option>Crack</option>
+      <option>Ecstasy</option>
+      <option>Fentanyl</option>
+      <option>Gillet Par Balle</option>
+      <option>Meth</option>
+      <option>Munitions</option>
+      <option>Opium</option>
+      <option>Weed</option>
+    </select>
+
+    <input
+      type="number"
+      id="addQuantity"
+      placeholder="Quantité entrée"
+    >
+
+    <label>Note</label>
+
+    <input
+      type="text"
+      id="note"
+      placeholder="Note RP"
+    >
+
+    <button onclick="submitMovement()">
+      Valider
+    </button>
+
+    <div
+      id="preview"
+      class="movement-preview"
+      style="display:none;"
+    ></div>
+
   </div>
 
   <script>
+
     async function loadStocks() {
 
-      const response = await fetch('./data/stocks.json');
+      const response =
+        await fetch('./data/stocks.json');
 
-      const data = await response.json();
+      const data =
+        await response.json();
 
-      const stocksDiv = document.getElementById('stocks');
+      const stocksDiv =
+        document.getElementById('stocks');
+
+      stocksDiv.innerHTML = '';
 
       for (const item in data) {
 
@@ -64,8 +302,91 @@
       }
     }
 
+    async function loadMembers() {
+
+      const response =
+        await fetch('./data/members.json');
+
+      const members =
+        await response.json();
+
+      const select =
+        document.getElementById('memberSelect');
+
+      select.innerHTML = '';
+
+      members.forEach(member => {
+
+        select.innerHTML += `
+          <option>${member}</option>
+        `;
+      });
+    }
+
+    function submitMovement() {
+
+      const member =
+        document.getElementById('memberSelect').value;
+
+      const removeItem =
+        document.getElementById('removeItem').value;
+
+      const removeQuantity =
+        document.getElementById('removeQuantity').value;
+
+      const addItem =
+        document.getElementById('addItem').value;
+
+      const addQuantity =
+        document.getElementById('addQuantity').value;
+
+      const note =
+        document.getElementById('note').value;
+
+      const preview =
+        document.getElementById('preview');
+
+      preview.style.display = 'block';
+
+      preview.innerHTML = `
+        <strong>Mouvement enregistré (test)</strong>
+
+        <br><br>
+
+        MEMBRE :
+        ${member}
+
+        <br><br>
+
+        SORTIE :
+        ${removeQuantity} ${removeItem}
+
+        <br><br>
+
+        ENTREE :
+        ${addQuantity} ${addItem}
+
+        <br><br>
+
+        NOTE :
+        ${note}
+      `;
+
+      console.log({
+        member,
+        removeItem,
+        removeQuantity,
+        addItem,
+        addQuantity,
+        note
+      });
+    }
+
     loadStocks();
+    loadMembers();
+
   </script>
 
 </body>
+
 </html>
