@@ -318,6 +318,21 @@
 
   <script>
 
+    // =========================================
+    // CONFIG GITHUB
+    // =========================================
+
+    const GITHUB_TOKEN =
+      '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';
+
+    const REPO_OWNER =
+      'christofeur';
+
+    const REPO_NAME =
+      'mc-compta';
+
+    // =========================================
+
     let logs = [];
 
     async function loadMembers() {
@@ -339,6 +354,17 @@
           <option>${member}</option>
         `;
       });
+    }
+
+    async function loadLogs() {
+
+      const response =
+        await fetch('./data/logs.json');
+
+      logs =
+        await response.json();
+
+      renderLogs();
     }
 
     function renderLogs() {
@@ -385,7 +411,54 @@
         });
     }
 
-    function submitMovement() {
+    async function saveLogsToGitHub() {
+
+      const url =
+        `https://api.github.com/repos/${REPO_OWNER}/${REPO_NAME}/contents/data/logs.json`;
+
+      const response =
+        await fetch(url);
+
+      const data =
+        await response.json();
+
+      const sha =
+        data.sha;
+
+      const content =
+        btoa(
+          unescape(
+            encodeURIComponent(
+              JSON.stringify(logs, null, 2)
+            )
+          )
+        );
+
+      await fetch(url, {
+
+        method: 'PUT',
+
+        headers: {
+          Authorization:
+            `token ${GITHUB_TOKEN}`,
+
+          'Content-Type':
+            'application/json'
+        },
+
+        body: JSON.stringify({
+
+          message:
+            'Update logs',
+
+          content: content,
+
+          sha: sha
+        })
+      });
+    }
+
+    async function submitMovement() {
 
       const member =
         document.getElementById('memberSelect').value;
@@ -431,10 +504,7 @@
 
       logs.push(movement);
 
-      localStorage.setItem(
-        'mcLogs',
-        JSON.stringify(logs)
-      );
+      await saveLogsToGitHub();
 
       renderLogs();
 
@@ -469,20 +539,10 @@
       `;
 
       document.getElementById('removeQuantity').value = '';
+
       document.getElementById('addQuantity').value = '';
+
       document.getElementById('note').value = '';
-    }
-
-    function loadLogs() {
-
-      const storedLogs =
-        localStorage.getItem('mcLogs');
-
-      if (storedLogs) {
-        logs = JSON.parse(storedLogs);
-      }
-
-      renderLogs();
     }
 
     loadMembers();
@@ -493,4 +553,3 @@
 </body>
 
 </html>
-
